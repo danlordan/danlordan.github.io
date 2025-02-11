@@ -5,28 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Redirecting to Calendar...</title>
     <script>
-      (function () {
+      (async function () {
         const baseLink =
           "https://calendar.google.com/calendar/u/0/r/eventedit?";
         const now = new Date();
 
-        // Find Get Next Tudesday
+        // Find the next Tuesday
         const nextTuesday = new Date();
         nextTuesday.setDate(now.getDate() + ((2 - now.getDay() + 7) % 7 || 7));
-        nextTuesday.setHours(13, 0, 0, 0); // 1:00 PM PST
+        nextTuesday.setHours(20, 0, 0, 0); // 8:00 PM EST
 
         const end = new Date(nextTuesday);
-        end.setHours(15); // Ends at 3:00 PM PST
+        end.setHours(22); // Ends at 10:00 PM EST
 
-        // Format to Google Calendar format (YYYYMMDDTHHMMSSZ)
-        const formattedStart =
-          nextTuesday.toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
-        const formattedEnd =
-          end.toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
+        // Detect the user's timezone
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-        const calendarLink = `${baseLink}dates=${formattedStart}/${formattedEnd}&details=Meeting+Link+:+https://us02web.zoom.us/j/86127378029%0AMeeting+Id+:+86127378029&text=ZOOM+at+8`;
+        // Convert to Google Calendar format with a timezone suffix
+        function formatGoogleDate(date) {
+          return date.toISOString().replace(/[-:.]/g, "").slice(0, 15);
+        }
 
-        // Redirect to the dynamically generated link
+        const formattedStart = formatGoogleDate(nextTuesday);
+        const formattedEnd = formatGoogleDate(end);
+
+        // Recurrence Rule: Every Tuesday until Jan 1, 2027
+        const recurrenceRule =
+          "RRULE:FREQ=WEEKLY;BYDAY=TU;UNTIL=20270101T000000Z";
+
+        // Build Google Calendar link with timezone support
+        const calendarLink = `${baseLink}dates=${formattedStart}/${formattedEnd}&ctz=${encodeURIComponent(
+          timeZone
+        )}&details=Meeting+Link+:+https://us02web.zoom.us/j/86127378029%0AMeeting+Id+:+86127378029&text=ZOOM+at+8&recur=${encodeURIComponent(
+          recurrenceRule
+        )}`;
+
+        // Redirect to Google Calendar
         window.location.href = calendarLink;
       })();
     </script>

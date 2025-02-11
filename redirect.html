@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecting to Calendar...</title>
+    <script>
+      (function () {
+        const baseLink =
+          "https://calendar.google.com/calendar/u/0/r/eventedit?";
+        const now = new Date();
+
+        // Find Get Next Tudesday
+        const nextTuesday = new Date();
+        nextTuesday.setDate(now.getDate() + ((2 - now.getDay() + 7) % 7 || 7));
+        nextTuesday.setHours(13, 0, 0, 0); // 1:00 PM PST
+
+        const end = new Date(nextTuesday);
+        end.setHours(15); // Ends at 3:00 PM PST
+
+        // Format to Google Calendar format (YYYYMMDDTHHMMSSZ)
+        const formattedStart =
+          nextTuesday.toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
+        const formattedEnd =
+          end.toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
+
+        const calendarLink = `${baseLink}dates=${formattedStart}/${formattedEnd}&details=Meeting+Link+:+https://us02web.zoom.us/j/86127378029%0AMeeting+Id+:+86127378029&text=ZOOM+at+8`;
+
+        // Redirect to the dynamically generated link
+        window.location.href = calendarLink;
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to Google Calendar...</p>
+  </body>
+</html>
